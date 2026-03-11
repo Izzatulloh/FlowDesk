@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/server";
-import OrdersClient from "./OrdersClient";
+import OrdersClient from "./client/OrdersClient";
 
 export default async function OrdersPage() {
     const supabase = await createClient();

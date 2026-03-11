@@ -7,7 +7,7 @@ import { createBrowserSupabaseClient } from "@/lib/supabase-browser";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { LayoutGrid, FileText, Package, LogOut, Loader2, ChevronRight } from "lucide-react";
+import { LayoutGrid, FileText, Package, LogOut, Loader2 } from "lucide-react";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },

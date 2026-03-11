@@ -1,20 +1,23 @@
 import { redirect } from "next/navigation";
+import { routes } from "@/lib/routes";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { createClient } from "@/lib/server";
-import { getViews } from "@/app/actions/view";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   FileText, Package, ChevronRight
 } from "lucide-react";
+import { getViews } from "../actions/views/getViews";
+
 
 
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+
+  if (!user) redirect(routes.login);
 
   const [invoiceViews, orderViews] = await Promise.all([
     getViews("invoices"),

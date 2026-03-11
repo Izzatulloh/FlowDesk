@@ -1,13 +1,11 @@
 "use client";
-
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import {
   ModuleRegistry, AllCommunityModule, ColDef,
-  GridReadyEvent, GridApi, SortChangedEvent, FilterChangedEvent,
+  GridReadyEvent, GridApi
 } from "ag-grid-community";
 import { useMemo, useRef, useState, useCallback, useEffect } from "react";
-import { createView, deleteView, updateView } from "@/app/actions/view";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,13 +23,15 @@ import {
   Save, PenLine, RotateCcw, Trash2, BookMarked,
   Loader2, AlertCircle, RefreshCw,
 } from "lucide-react";
+import { updateView } from "@/app/actions/views/updateView";
+import { createView } from "@/app/actions/views/createView";
+import { deleteView } from "@/app/actions/views/deleteView";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 export type GridViewConfig = {
   columnState: any;
   filterModel: any;
-  sortModel: any;
 };
 
 type GenericGridProps = {
@@ -43,7 +43,7 @@ type GenericGridProps = {
   savedViewState?: GridViewConfig | null;
   savedViews?: any[];
   onViewsUpdated?: () => void;
-  onServerRefetch?: (sortModel: any[], filterModel: Record<string, any>) => void;
+  onServerRefetch?: (filterModel: Record<string, any>) => void;
   isRefetching?: boolean;
 };
 
@@ -105,36 +105,28 @@ export default function GenericGrid({
     if (!gridApiRef.current) return null;
     try {
       const api = gridApiRef.current;
-      return { columnState: api.getColumnState() ?? [], filterModel: api.getFilterModel() ?? null, sortModel: [] };
+      return { columnState: api.getColumnState() ?? [], filterModel: api.getFilterModel() ?? {} };
     } catch { return null; }
   }, []);
 
   const markUnsaved = useCallback(() => setUnsaved(true), []);
 
-  const handleSortChanged = useCallback((e: SortChangedEvent) => {
-    markUnsaved();
-    if (!onServerRefetch || !gridApiRef.current) return;
-    const colState = gridApiRef.current.getColumnState();
-    const sortModel = colState.filter(c => c.sort).map(c => ({ colId: c.colId, sort: c.sort as "asc" | "desc" }));
-    onServerRefetch(sortModel, gridApiRef.current.getFilterModel() ?? {});
-  }, [onServerRefetch, markUnsaved]);
+  const handleSortChanged = useCallback(() => markUnsaved(), [markUnsaved]);
 
-  const handleFilterChanged = useCallback((e: FilterChangedEvent) => {
+  const handleFilterChanged = useCallback(() => {
     markUnsaved();
     if (!onServerRefetch || !gridApiRef.current) return;
-    const colState = gridApiRef.current.getColumnState();
-    const sortModel = colState.filter(c => c.sort).map(c => ({ colId: c.colId, sort: c.sort as "asc" | "desc" }));
-    onServerRefetch(sortModel, gridApiRef.current.getFilterModel() ?? {});
+    onServerRefetch(gridApiRef.current.getFilterModel() ?? {});
   }, [onServerRefetch, markUnsaved]);
 
   const handleReset = useCallback(() => {
     if (!gridApiRef.current) return;
-    gridApiRef.current.setFilterModel(null);
+    gridApiRef.current.setFilterModel({});
     gridApiRef.current.resetColumnState();
     setUnsaved(false);
     setSelectedViewId(null);
     setSelectedViewName("");
-    onServerRefetch?.([], {});
+    onServerRefetch?.({});
   }, [onServerRefetch]);
 
   const openSaveDialog = useCallback((mode: "new" | "update") => {
@@ -189,12 +181,9 @@ export default function GenericGrid({
     if (!view || !gridApiRef.current) return;
     setSelectedViewId(viewId);
     setSelectedViewName(view.view_name);
-    applyViewConfig({ columnState: view.column_state, filterModel: view.filter_model, sortModel: view.sort_model }, gridApiRef.current);
+    applyViewConfig({ columnState: view.column_state, filterModel: view.filter_model }, gridApiRef.current);
     setUnsaved(false);
-    if (onServerRefetch) {
-      const sortModel = (view.column_state ?? []).filter((c: any) => c.sort).map((c: any) => ({ colId: c.colId, sort: c.sort }));
-      onServerRefetch(sortModel, view.filter_model ?? {});
-    }
+    onServerRefetch?.(view.filter_model ?? {});
   }, [savedViews, applyViewConfig, onServerRefetch]);
 
   return (
@@ -217,7 +206,6 @@ export default function GenericGrid({
                 </Badge>
               )}
             </div>
-
             <div className="flex items-center gap-2 flex-wrap">
               <Tooltip content="Save current grid state as a new view">
                 <Button size="sm" onClick={() => openSaveDialog("new")} className="gap-1.5">
@@ -235,7 +223,7 @@ export default function GenericGrid({
                 </Tooltip>
               )}
 
-              <Tooltip content="Reset columns, filters and sort to defaults">
+              <Tooltip content="Reset columns, filters to defaults">
                 <Button size="sm" variant="outline" onClick={handleReset} className="gap-1.5">
                   <RotateCcw className="h-3.5 w-3.5" />
                   Reset
@@ -243,24 +231,24 @@ export default function GenericGrid({
               </Tooltip>
             </div>
           </div>
-          {savedViews.length > 0 && (
-            <div className="flex items-center gap-2 flex-wrap pt-3">
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground shrink-0">
-                <BookMarked className="h-3.5 w-3.5" />
-                <span className="font-medium">Saved Views:</span>
-              </div>
-              <Select
-                value={selectedViewId || ""}
-                onChange={(e) => handleSelectView(e.target.value)}
-                className="w-52 h-10 text-s"
-              >
-                <option value="" disabled>Select a view</option>
-                {savedViews.map(view => (
-                  <option key={view.id} value={view.id}>{view.view_name}</option>
-                ))}
-              </Select>
-              {selectedViewId && (
-                <>
+          <div className="flex">
+            {savedViews.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap pt-3">
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground shrink-0">
+                  <BookMarked className="h-3.5 w-3.5" />
+                  <span className="font-medium">Saved Views:</span>
+                </div>
+                <Select
+                  value={selectedViewId || ""}
+                  onChange={(e) => handleSelectView(e.target.value)}
+                  className="w-52 h-10 text-s"
+                >
+                  <option value="" disabled>Select a view</option>
+                  {savedViews.map(view => (
+                    <option key={view.id} value={view.id}>{view.view_name}</option>
+                  ))}
+                </Select>
+                {selectedViewId && (
                   <Tooltip content="Delete this saved view">
                     <Button
                       size="sm"
@@ -271,11 +259,10 @@ export default function GenericGrid({
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </Tooltip>
-                </>
-              )}
-            </div>
-          )}
-
+                )}
+              </div>
+            )}
+          </div>
           <Separator className="mt-4" />
         </CardHeader>
 
@@ -304,12 +291,10 @@ export default function GenericGrid({
       <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {saveMode === "update" ? "Update View" : "Save as New View"}
-            </DialogTitle>
+            <DialogTitle>{saveMode === "update" ? "Update View" : "Save as New View"}</DialogTitle>
             <DialogDescription>
               {saveMode === "update"
-                ? `Update "${selectedViewName}" with the current column arrangement, filters, and sort.`
+                ? `Update "${selectedViewName}" with the current column arrangement and filters.`
                 : "Save the current grid configuration as a named view you can reload anytime."}
             </DialogDescription>
           </DialogHeader>
@@ -328,9 +313,7 @@ export default function GenericGrid({
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowSaveDialog(false)} disabled={isSaving}>
-              Cancel
-            </Button>
+            <Button variant="outline" onClick={() => setShowSaveDialog(false)} disabled={isSaving}>Cancel</Button>
             <Button onClick={handleSaveView} disabled={isSaving} className="gap-1.5">
               {isSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               {isSaving ? "Saving..." : saveMode === "update" ? "Update" : "Save View"}
@@ -344,13 +327,11 @@ export default function GenericGrid({
           <DialogHeader>
             <DialogTitle>Delete View</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete <span className="font-semibold text-foreground">"{selectedViewName}"</span>? This action cannot be undone.
+              Are you sure you want to delete <span className="font-semibold">{selectedViewName}</span>? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)} disabled={isDeleting}>
-              Cancel
-            </Button>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)} disabled={isDeleting}>Cancel</Button>
             <Button variant="destructive" onClick={handleDeleteView} disabled={isDeleting} className="gap-1.5">
               {isDeleting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               {isDeleting ? "Deleting..." : "Delete View"}

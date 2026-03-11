@@ -32,7 +32,12 @@ export default function LoginPage() {
       }
     });
   };
-
+  const handleTabSwitch = (newTab: "signin" | "signup") => {
+    setTab(newTab);
+    setMessage(null);
+    const form = document.getElementById("auth-form") as HTMLFormElement | null;
+    form?.reset();
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
@@ -48,22 +53,20 @@ export default function LoginPage() {
           <CardHeader className="pb-4">
             <div className="flex rounded-lg border bg-muted p-1 gap-1">
               <button
-                onClick={() => { setTab("signin"); setMessage(null); }}
-                className={`flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-all ${
-                  tab === "signin"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+                onClick={() => handleTabSwitch("signin")}
+                className={`flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-all ${tab === "signin"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 Sign In
               </button>
               <button
-                onClick={() => { setTab("signup"); setMessage(null); }}
-                className={`flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-all ${
-                  tab === "signup"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+                onClick={() => handleTabSwitch("signup")}
+                className={`flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-all ${tab === "signup"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 Sign Up
               </button>

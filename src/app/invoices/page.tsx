@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/server";
-import InvoicesClient from "./InvoicesClient";
+import InvoicesClient from "./client/InvoicesClient";
 
 export default async function InvoicesPage() {
   const supabase = await createClient();

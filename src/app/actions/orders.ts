@@ -18,8 +18,6 @@ export interface Order {
   estimated_delivery?: string;
 }
 
-export type SortModel = { colId: string; sort: "asc" | "desc" }[];
-
 export type FilterModel = Record<
   string,
   {
@@ -33,11 +31,7 @@ export type FilterModel = Record<
   }
 >;
 
-function applyFiltersAndSort(
-  query: any,
-  sortModel?: SortModel,
-  filterModel?: FilterModel
-) {
+function applyFiltersAndSort(query: any, filterModel?: FilterModel, sortModel?: { colId: string, sort: "asc" | "desc" }[]) {
   if (filterModel) {
     for (const [field, condition] of Object.entries(filterModel)) {
       if (condition.filterType === "text" && condition.filter) {
@@ -86,12 +80,12 @@ function applyFiltersAndSort(
 }
 
 export const getOrders = async (
-  sortModel?: SortModel,
-  filterModel?: FilterModel
+  filterModel?: FilterModel,
+  sortModel?: { colId: string, sort: "asc" | "desc" }[]
 ): Promise<Order[]> => {
   const supabase = await createClient();
   let query = supabase.from("orders").select("*");
-  query = applyFiltersAndSort(query, sortModel, filterModel);
+  query = applyFiltersAndSort(query, filterModel, sortModel);
   const { data, error } = await query;
   if (error) { console.error("Error fetching orders:", error); return []; }
   return data || [];
@@ -100,7 +94,10 @@ export const getOrders = async (
 export const getOrderById = async (orderId: string): Promise<Order | null> => {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("orders").select("*").eq("order_id", orderId).single();
+    .from("orders")
+    .select("*")
+    .eq("order_id", orderId)
+    .single();
   if (error) { console.error("Error fetching order:", error); return null; }
   return data;
 };
