@@ -37,7 +37,6 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
 
-        {/* Brand */}
         <div className="flex flex-col items-center gap-3 text-center">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">GridApp</h1>

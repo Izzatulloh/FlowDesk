@@ -7,21 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
-  FileText, Package, CheckCircle2, Server, Filter, Shield,
-  BookMarked, Eye, RotateCcw, Link2, KeyRound, ChevronRight
+  FileText, Package, ChevronRight
 } from "lucide-react";
 
-const FEATURES = [
-  { icon: Server, text: "Server-Side Rendering (SSR) data fetching" },
-  { icon: Filter, text: "Server-side filtering & sorting via Supabase API" },
-  { icon: Shield, text: "Per-user view persistence (Supabase RLS enforced)" },
-  { icon: BookMarked, text: "Save as New View / Update View / Delete View" },
-  { icon: Eye, text: "Default visible columns with hidden column access" },
-  { icon: CheckCircle2, text: "Unsaved changes indicator" },
-  { icon: RotateCcw, text: "Reset to Default grid state" },
-  { icon: Link2, text: "Deep-link views via ?view=<id> URL param" },
-  { icon: KeyRound, text: "Email + Password auth with Supabase Auth" },
-];
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -38,14 +26,11 @@ export default async function DashboardPage() {
       <Navbar />
       <div className="max-w-[1400px] mx-auto p-8 space-y-8">
 
-        {/* Header */}
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         </div>
 
-        {/* Grid cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Invoices card */}
           <Link href="/invoices" className="group block">
             <Card className="h-full transition-all hover:shadow-md hover:border-primary/50 cursor-pointer">
               <CardHeader className="pb-3">
@@ -86,7 +71,6 @@ export default async function DashboardPage() {
             </Card>
           </Link>
 
-          {/* Orders card */}
           <Link href="/orders" className="group block">
             <Card className="h-full transition-all hover:shadow-md hover:border-primary/50 cursor-pointer">
               <CardHeader className="pb-3">

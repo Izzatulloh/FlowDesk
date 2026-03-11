@@ -7,13 +7,12 @@ import { createBrowserSupabaseClient } from "@/lib/supabase-browser";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { LayoutGrid, FileText, Package, LogOut, Loader2, ChevronRight } from "lucide-react";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
-  { href: "/invoices",  label: "Invoices",  icon: FileText },
-  { href: "/orders",    label: "Orders",    icon: Package },
+  { href: "/invoices", label: "Invoices", icon: FileText },
+  { href: "/orders", label: "Orders", icon: Package },
 ];
 
 export default function Navbar() {
@@ -41,7 +40,6 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="max-w-[1400px] mx-auto flex h-14 items-center px-6 gap-6">
 
-        {/* Brand */}
         <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <LayoutGrid className="h-4 w-4" />
@@ -51,7 +49,6 @@ export default function Navbar() {
 
         <Separator orientation="vertical" className="h-5" />
 
-        {/* Nav */}
         <nav className="flex items-center gap-1 flex-1">
           {navLinks.map(({ href, label, icon: Icon }) => (
             <Link
@@ -70,7 +67,6 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* User */}
         <div className="flex items-center gap-3 shrink-0">
           {userEmail && (
             <span className="hidden sm:block text-xs text-muted-foreground max-w-[160px] truncate">

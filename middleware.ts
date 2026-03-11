@@ -2,13 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  // Agar env yo'q bo'lsa middleware yiqilmasin
-  if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.next();
-  }
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
   let response = NextResponse.next({
     request: {
@@ -26,12 +21,6 @@ export async function middleware(request: NextRequest) {
           request.cookies.set(name, value)
         );
 
-        response = NextResponse.next({
-          request: {
-            headers: request.headers,
-          },
-        });
-
         cookiesToSet.forEach(({ name, value, options }) =>
           response.cookies.set(name, value, options)
         );
@@ -45,20 +34,17 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  // public sahifalar
   const publicRoutes = ["/login"];
   const isPublic = publicRoutes.some((route) =>
     pathname.startsWith(route)
   );
 
-  // login qilmagan user protected sahifaga kirmoqchi bo'lsa
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  // login qilgan user login sahifaga kirsa dashboardga yuboriladi
   if (user && pathname.startsWith("/login")) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
@@ -70,6 +56,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };
