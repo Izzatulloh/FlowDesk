@@ -7,9 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { LayoutGrid, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
   const [tab, setTab] = useState<"signin" | "signup">("signin");
@@ -44,8 +42,8 @@ export default function LoginPage() {
 
         <div className="flex flex-col items-center gap-3 text-center">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">GridApp</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">AG-Grid View Management System</p>
+            <h1 className="text-2xl font-bold tracking-tight">FlowDesk</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">Management System</p>
           </div>
         </div>
 
