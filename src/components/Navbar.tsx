@@ -44,7 +44,7 @@ export default function Navbar() {
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <LayoutGrid className="h-4 w-4" />
           </div>
-          <span className="font-bold text-base tracking-tight">GridApp</span>
+          <span className="font-bold text-base tracking-tight">FlowDesk</span>
         </Link>
 
         <Separator orientation="vertical" className="h-5" />

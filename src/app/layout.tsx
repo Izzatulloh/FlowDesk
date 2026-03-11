@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "GridApp",
+  title: "FlowDesk",
   description: "Next.js + Supabase AG-Grid Views Management System",
 };
 
